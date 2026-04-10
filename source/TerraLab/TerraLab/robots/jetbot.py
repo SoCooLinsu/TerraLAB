@@ -1,0 +1,9 @@
+import isaaclab.sim as sim_utils
+from isaaclab.assets import ArticulationCfg
+from isaaclab.actuators import ImplicitActuatorCfg
+from isaaclab.utils.assets import ISAAC_NUCLEUS_DIR
+
+JETBOT_CONFIG = ArticulationCfg(
+    spawn=sim_utils.UsdFileCfg(usd_path=f"{ISAAC_NUCLEUS_DIR}/Robots/NVIDIA/Jetbot/jetbot.usd", activate_contact_sensors=True),
+    actuators={"wheel_acts": ImplicitActuatorCfg(joint_names_expr=[".*"], damping=0.01, stiffness=None, velocity_limit_sim=20.0)}
+)

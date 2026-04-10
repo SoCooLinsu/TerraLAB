@@ -14,7 +14,7 @@ from . import agents
 
 gym.register(
     id="Template-Terralab-v0",
-    entry_point="isaaclab.envs:ManagerBasedRLEnv",
+    entry_point= f"{__name__}.terralab_env_cfg:TerralabEnv",
     disable_env_checker=True,
     kwargs={
         "env_cfg_entry_point": f"{__name__}.terralab_env_cfg:TerralabEnvCfg",
