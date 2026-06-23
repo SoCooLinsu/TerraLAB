@@ -16,9 +16,9 @@ ROVER_CONFIG = ArticulationCfg(
             joint_names_expr=["Wheel_joint_.*"], 
             stiffness=0.0,
             damping=0.0001,
-            armature=0.005,
-            velocity_limit_sim=4.8171,   #rad/s
-            effort_limit_sim=0.3,  #Nm
+            armature=0.01,
+            velocity_limit_sim=15,   #rad/s
+            effort_limit_sim=5.0,  #Nm
         ),
         "passive_rocker": ImplicitActuatorCfg(
             joint_names_expr=["Rocker_joint_.*"],

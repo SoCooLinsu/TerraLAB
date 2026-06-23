@@ -47,14 +47,32 @@ class TerralabSceneCfg(InteractiveSceneCfg):
     terrain = TerrainImporterCfg(
         prim_path= "/World",
         terrain_type = 'usd',
-        usd_path = r"C:\test\source\test\test\tasks\manager_based\test\Terrain.usd",
+        usd_path = r"C:\test\source\test\test\tasks\manager_based\test\Terrain0.5.usd",
         env_spacing = 1.0,
         collision_group=-1,
     )
 
-    # terrain = AssetBaseCfg(
+    #terrain = AssetBaseCfg(
+    #    prim_path="/World/terrain/Terrain/moon",
+    #    spawn=sim_utils.GroundPlaneCfg(size=(50.0, 50.0)),
+    #)
+
+    # terrain = TerrainImporterCfg(
     #     prim_path="/World/terrain/Terrain/moon",
-    #     spawn=sim_utils.GroundPlaneCfg(size=(100.0, 100.0)),
+    #     terrain_type="plane",
+    #     collision_group=-1,
+    #     physics_material=sim_utils.RigidBodyMaterialCfg(
+    #         friction_combine_mode="multiply",
+    #         restitution_combine_mode="multiply",
+    #         static_friction=1.0,
+    #         dynamic_friction=1.0,
+    #     ),
+    #     visual_material=sim_utils.MdlFileCfg(
+    #         mdl_path=f"{ISAACLAB_NUCLEUS_DIR}/Materials/TilesMarbleSpiderWhiteBrickBondHoned/TilesMarbleSpiderWhiteBrickBondHoned.mdl",
+    #         project_uvw=True,
+    #         texture_scale=(0.25, 0.25),
+    #     ),
+    #     debug_vis=False,
     # )
 
     # terrain = TerrainImporterCfg(
@@ -100,7 +118,7 @@ class TerralabSceneCfg(InteractiveSceneCfg):
         debug_vis = False,
         actuator_value_resolution_debug_print=True,
         init_state=ArticulationCfg.InitialStateCfg(
-            pos=(0.0, 0.0, 0.1),
+            pos=(0.0, 1.0, 0.15),
             rot=(1.0, 0.0, 0.0, 0.0),
         ),
         actuators=ROVER_CONFIG.actuators,
@@ -120,11 +138,11 @@ class TerralabSceneCfg(InteractiveSceneCfg):
             size=(0.0, 0.0),
         ),
         offset=RayCasterCfg.OffsetCfg(
-            pos=(0.0, 0.0, 0.0),
+            pos=(0.0, 0.0, 1.0),
             rot=(1.0, 0.0, 0.0, 0.0)
         ),
         max_distance = 5.0,
-        debug_vis = True,
+        debug_vis = False,
         ray_alignment="yaw",
     )
 
@@ -136,11 +154,11 @@ class TerralabSceneCfg(InteractiveSceneCfg):
             size=(0.0, 0.0),
         ),
         offset=RayCasterCfg.OffsetCfg(
-            pos=(0.0, 0.0, 0.0),
+            pos=(0.0, 0.0, 1.0),
             rot=(1.0, 0.0, 0.0, 0.0)
         ),
         max_distance = 5.0,
-        debug_vis = True,
+        debug_vis = False,
         ray_alignment="yaw",
     )
     
@@ -152,11 +170,11 @@ class TerralabSceneCfg(InteractiveSceneCfg):
             size=(0.0, 0.0),
         ),
         offset=RayCasterCfg.OffsetCfg(
-            pos=(0.0, 0.0, 0.0),
+            pos=(0.0, 0.0, 1.0),
             rot=(1.0, 0.0, 0.0, 0.0)
         ),
         max_distance = 5.0,
-        debug_vis = True,
+        debug_vis = False,
         ray_alignment="yaw",
     )
 
@@ -168,11 +186,11 @@ class TerralabSceneCfg(InteractiveSceneCfg):
             size=(0.0, 0.0),
         ),
         offset=RayCasterCfg.OffsetCfg(
-            pos=(0.0, 0.0, 0.0),
+            pos=(0.0, 0.0, 1.0),
             rot=(1.0, 0.0, 0.0, 0.0)
         ),
         max_distance = 5.0,
-        debug_vis = True,
+        debug_vis = False,
         ray_alignment="yaw",
     )
 
@@ -208,8 +226,8 @@ class ActionsCfg:
     robot = mdp.JointEffortActionCfg(
         asset_name="robot",
         joint_names=["Wheel_joint_.*"],
-        scale=0.3,
-        clip={"Wheel_joint_.*": (-1.0, 1.0)},
+        scale=3.0,
+        # clip={"Wheel_joint_.*": (-1.0, 1.0)},
     )
 
 
@@ -222,7 +240,8 @@ class ObservationsCfg:
         """Observations for policy group."""
 
         # input task
-        velocity_commands = ObsTerm(func=mdp.generated_commands, params={"command_name": "base_velocity"})
+        #velocity_commands = ObsTerm(func=mdp.generated_commands, params={"command_name": "base_velocity"})
+        pose_command = ObsTerm(func=mdp.generated_commands, params={"command_name": "pose_command"})
         base_lin_vel = ObsTerm(func=mdp.base_lin_vel)
         base_ang_vel = ObsTerm(func=mdp.base_ang_vel)
         # # (3) Gravity (3 inputs)
@@ -230,7 +249,7 @@ class ObservationsCfg:
         # # (4) Current Rocker joint Position (rocker_l, rocker_r) (2 inputs)
         rocker_position = ObsTerm(func=mdp.joint_pos, params={"asset_cfg": SceneEntityCfg("robot", joint_names=["Rocker_joint_.*"])}, scale=3 / torch.pi)
         # # (5) Current wheel velocity (fl, rl fr rr) (4 inputs)
-        wheel_velocities = ObsTerm(func=mdp.joint_vel, params={"asset_cfg": SceneEntityCfg("robot", joint_names=["Wheel_joint_.*"])}, scale=1 / 4.8171)
+        wheel_velocities = ObsTerm(func=mdp.joint_vel, params={"asset_cfg": SceneEntityCfg("robot", joint_names=["Wheel_joint_.*"])}, scale=1 / 15.0)
         actions = ObsTerm(func=mdp.last_action)
         # height_scan = ObsTerm(
         #     func=mdp.height_scan,
@@ -256,26 +275,74 @@ class EventCfg:
         params={
             "pose_range": {"x": (-0.5, 0.5), "y": (-0.5, 0.5), "yaw": (-3.14, 3.14)},
             "velocity_range": {
-                "x": (-0.1, 0.1),
-                "y": (-0.1, 0.1),
+                "x": (-0.0, 0.0),
+                "y": (-0.0, 0.0),
                 "z": (-0.0, 0.0),
                 "roll": (-0.0, 0.0),
                 "pitch": (-0.0, 0.0),
-                "yaw": (-0.5, 0.5),
+                "yaw": (-0.0, 0.0),
             },
         },
     )
 
+    # 토양 성질 도메인 랜덤화
+    randomize_soil = EventTerm(
+        func=mdp.randomize_soil_properties_startup,
+        mode="startup", 
+        params={
+            "soil_ranges": {
+                'kc': (888.0, 1111.0),
+                'kphi': (828000.0, 1228000.0),
+                'c_soil': (1600.0, 1800.0),
+                'phi_soil': (0.6, 0.8),
+                'Kx': (0.0003, 0.0006),
+                'Ky': (0.0006, 0.0012),
+            }
+        },
+    )
+
+    # 토양 성질 그리드 스윕 (발표 시각화용)
+    # grid_sweep_soil = EventTerm(
+    #     func=mdp.grid_soil_properties_startup, # 새로 만든 함수로 변경!
+    #     mode="startup", 
+    #     params={
+    #         "soil_ranges": {
+    #             # 스윕하고 싶은 최소-최대 범위를 지정하세요
+    #             'kc': (490.0, 490.0),       # X축: 좌측에서 우측으로 갈수록 kc 증가
+    #             'kphi': (528000.0, 528000.0), # Y축: 아래에서 위로 갈수록 kphi 증가
+    #             # 아래 값들은 시각화 통제를 위해 이 범위의 "중간값"으로 일괄 고정됩니다.
+    #             'c_soil': (0.0, 3000.0),
+    #             'phi_soil': (0.0872665, 0.785398),
+    #             'Kx': (0.0006, 0.0006),
+    #             'Ky': (0.005, 0.005),
+    #         }
+    #     },
+    # )
 
 @configclass
 class RewardsCfg:
     """Reward terms for the MDP."""
     # -- task
-    track_lin_vel_xy_exp = RewTerm(func=mdp.track_lin_vel_xy_exp, weight=1.0, params={"command_name": "base_velocity", "std": math.sqrt(0.005)})
-    track_ang_vel_z_exp = RewTerm(func=mdp.track_ang_vel_z_exp, weight=1.0, params={"command_name": "base_velocity", "std": math.sqrt(0.010)})
-    # is_alive = 
+    #track_lin_vel_xy_exp = RewTerm(func=mdp.track_lin_vel_xy_exp, weight=10.0, params={"command_name": "base_velocity", "std": math.sqrt(0.025)})
+    #track_ang_vel_z_exp = RewTerm(func=mdp.track_ang_vel_z_exp, weight=0.5, params={"command_name": "base_velocity", "std": math.sqrt(0.025)})
+    position_tracking = RewTerm(
+        func=mdp.position_command_error_tanh,
+        weight=10.0,
+        params={"std": 3.0, "command_name": "pose_command"},
+    )
+    position_tracking_fine_grained = RewTerm(
+        func=mdp.position_command_error_tanh,
+        weight=10.0,
+        params={"std": 0.6, "command_name": "pose_command"},
+    )
+    orientation_tracking = RewTerm(
+        func=mdp.heading_command_error_abs,
+        weight=-0.5,
+        params={"command_name": "pose_command"},
+    )
     # -- penalty
-    power_consumption = RewTerm(func=mdp.rover_power_consumption, weight=-0.01, params={"asset_cfg": SceneEntityCfg("robot", joint_names=["Wheel_joint_.*"])})
+    power_consumption = RewTerm(func=mdp.rover_power_consumption, weight=-0.005, params={"asset_cfg": SceneEntityCfg("robot", joint_names=["Wheel_joint_.*"])})
+    wheel_acc_l2 = RewTerm(func=mdp.joint_acc_l2, weight=-0.000005, params={"asset_cfg": SceneEntityCfg("robot", joint_names=["Wheel_joint_.*"])})
     action_rate_l2 = RewTerm(func=mdp.action_rate_l2, weight=-0.01)
 
 
@@ -285,21 +352,33 @@ class TerminationsCfg:
 
     # (1) Time out
     time_out = DoneTerm(func=mdp.time_out, time_out=True)
-    bad_orientation = DoneTerm(func=mdp.bad_orientation, time_out=False, params={"limit_angle": 0.523599})
+    #base_contact = DoneTerm(
+    #    func=mdp.illegal_contact,
+    #    params={"sensor_cfg": SceneEntityCfg("contact_forces", body_names="base_link"), "threshold": 1.0},
+    #)
+    bad_orientation = DoneTerm(func=mdp.bad_orientation, time_out=False, params={"limit_angle": 0.8})
 
 
 @configclass
 class CommandsCfg:
     """Command specifications for the MDP."""
 
-    base_velocity = mdp.UniformVelocityCommandCfg(
+    #base_velocity = mdp.UniformVelocityCommandCfg(
+    #    asset_name="robot",
+    #    resampling_time_range=(0.0, 10.0),
+    #    rel_standing_envs=0.00,
+    #    debug_vis=True,
+    #    ranges=mdp.UniformVelocityCommandCfg.Ranges(
+    #        lin_vel_x=(0.5, 0.5), lin_vel_y=(0.0, 0.0), ang_vel_z=(-0.0, 0.0),
+    #    ),
+    #)
+
+    pose_command = mdp.UniformPose2dCommandCfg(
         asset_name="robot",
-        resampling_time_range=(0.0, 5.0),
-        rel_standing_envs=0.02,
+        simple_heading=False,
+        resampling_time_range=(8.0, 8.0),
         debug_vis=True,
-        ranges=mdp.UniformVelocityCommandCfg.Ranges(
-            lin_vel_x=(-0.1, 0.1), lin_vel_y=(0.0, 0.0), ang_vel_z=(-0.2, 0.2),
-        ),
+        ranges=mdp.UniformPose2dCommandCfg.Ranges(pos_x=(-3.0, 3.0), pos_y=(-3.0, 3.0), heading=(-math.pi, math.pi)),
     )
 
 
@@ -311,7 +390,7 @@ class CommandsCfg:
 @configclass
 class TerralabEnvCfg(ManagerBasedRLEnvCfg):
     # Scene settings
-    scene: TerralabSceneCfg = TerralabSceneCfg(num_envs=4096, env_spacing=0.8)
+    scene: TerralabSceneCfg = TerralabSceneCfg(num_envs=4096, env_spacing=0.0)
     # Basic settings
     observations: ObservationsCfg = ObservationsCfg()
     actions: ActionsCfg = ActionsCfg()
@@ -325,10 +404,10 @@ class TerralabEnvCfg(ManagerBasedRLEnvCfg):
     def __post_init__(self) -> None:
         """Post initialization."""
         # general settings
-        self.decimation = 10
-        self.episode_length_s = 20
+        self.decimation = 5
+        self.episode_length_s = 8
         # viewer settings
-        self.viewer.eye = (5.0, 0.0, 1.0)
+        self.viewer.eye = (5.0, 0.0, 5.0)
         # simulation settings
         self.sim.gravity = (0.0, 0.0, -1.62)
         self.sim.dt = 0.002
@@ -346,25 +425,53 @@ class TerralabEnvCfg(ManagerBasedRLEnvCfg):
 class TerralabEnv(ManagerBasedRLEnv):
 
     def __init__(self, cfg, **kwargs):
-        super().__init__(cfg, **kwargs)
-        self.R = 0.037
-        self.p = {
-            'b': 0.025, 'n': 1.0,
-            'kc': 990, 'kphi': 1528000.0,
-            'c1': 0.30, 'c2': 0.10,
-            'c_soil': 1716.0, 'phi_soil': 0.7086, 'mu_s': 0.8,
-            'Kx': 0.0006, 'Ky': 0.005,
-            'c_s': 15.0, 
-            'rho_s': 1600.0,  # 흙의 밀도 (kg/m^3)
-            'alpha_b': 0.0    # 흙을 미는 가상 블레이드의 각도
-        }
-        self.prev_sinkage = torch.zeros((self.num_envs, 4), device=self.device)
+        
+        # 1. 부모 클래스 초기화 전에 설정(cfg)에서 디바이스와 환경 개수 추출
+        num_envs = cfg.scene.num_envs
+        device = cfg.sim.device
 
-        # 불도저 상수 Init
-        Xc = (math.pi / 4.0) - (self.p['phi_soil'] / 2.0)
-        def cot(x): return 1.0 / math.tan(x)
-        self.C1 = (cot(Xc) + math.tan(Xc + self.p['phi_soil'])) / (1.0 - math.tan(self.p['alpha_b']  ) * math.tan(Xc + self.p['phi_soil']))
-        self.C2 = (cot(Xc) - math.tan(self.p['alpha_b']  )) + ((cot(Xc) - math.tan(self.p['alpha_b']  ))**2) / (math.tan(self.p['alpha_b']  ) + cot(self.p['phi_soil']))
+        # 2. 토양 파라미터 텐서를 부모 init 호출 "전에" 미리 생성
+        # [수정] self.num_envs -> num_envs, self.device -> device 로 변경!
+        self.p = {
+            'b': torch.full((num_envs,), 0.0375, device=device),
+            'n': torch.full((num_envs,), 1.0, device=device),
+            'kc': torch.full((num_envs,), 990.0, device=device),
+            'kphi': torch.full((num_envs,), 1528000.0, device=device),
+            'c1': torch.full((num_envs,), 0.30, device=device),
+            'c2': torch.full((num_envs,), 0.10, device=device),
+            'c_soil': torch.full((num_envs,), 1716.0, device=device),
+            'phi_soil': torch.full((num_envs,), 0.7086, device=device),
+            'mu_s': torch.full((num_envs,), 0.8, device=device),
+            'Kx': torch.full((num_envs,), 0.0006, device=device),
+            'Ky': torch.full((num_envs,), 0.005, device=device),
+            'c_s': torch.full((num_envs,), 40.0, device=device),
+            'rho_s': torch.full((num_envs,), 3340.0, device=device),
+            'alpha_b': torch.full((num_envs,), 0.0, device=device)
+        }
+        
+        # 여기도 마찬가지로 지역 변수 사용
+        self.C1 = torch.zeros((num_envs,), device=device)
+        self.C2 = torch.zeros((num_envs,), device=device)
+
+        self.R = 0.0555
+        self.prev_sinkage = torch.zeros((num_envs, 4), device=device)
+
+        # 3. 부모 클래스 __init__ 호출 
+        super().__init__(cfg, **kwargs)
+
+        print("\n" + "="*60)
+        print(f"🚀 [디버그] 토양 파라미터 도메인 랜덤화 결과 (총 {self.num_envs}개 환경)")
+        # 텐서가 GPU에 있으므로 보기 편하게 리스트로 변환해서 출력합니다.
+        print(f" - kphi (Y축 스윕)   : {self.p['kphi'][::6][:5].tolist()}")
+        print(f" - phi_soil (마찰각) : {self.p['phi_soil'][:5].tolist()}")
+        print(f" - c_soil (점착력)   : {self.p['c_soil'][:5].tolist()}")
+        print(f" - kc (변형 계수)    : {self.p['kc'][:5].tolist()}")
+        print(f" - C1 (불도징 계수 1): {self.C1[:5].tolist()}")
+        print("="*60 + "\n")
+        
+        # 초기 기본값으로 C1, C2 세팅 (이벤트 매니저가 곧 덮어쓰겠지만 안전을 위해)
+        # all_env_ids = torch.arange(self.num_envs, device=self.device)
+        # mdp.randomize_soil_properties_startup(self, all_env_ids, {}) # 초기값 기반 연산
         
         # (주의: step 함수에서 centers_z를 stack한 순서와 똑같아야 합니다!)
         dummy_names = ["Force_FL", "Force_RL", "Force_FR", "Force_RR"]
@@ -500,7 +607,7 @@ class TerralabEnv(ManagerBasedRLEnv):
             self.scene["Sinkage_scan_FR"].data.ray_hits_w[:, 0, 2],
             self.scene["Sinkage_scan_RR"].data.ray_hits_w[:, 0, 2]], dim=1)
         
-        self.Sinkage = torch.clamp(self.R - (centers_z - hits_z), min=1e-6, max=self.R)
+        self.Sinkage = torch.clamp(self.R - (centers_z - hits_z), min=1e-9, max=2*self.R)
 
         # 침하량 변화율
         v_c = torch.clamp((self.Sinkage - self.prev_sinkage) / dt, min=0.0)
@@ -570,81 +677,95 @@ class TerralabEnv(ManagerBasedRLEnv):
     
     def wong_reece_model_torch(self, s: torch.Tensor, h: torch.Tensor, v_c: torch.Tensor, alpha: torch.Tensor):
 
-        # 벡터화된 Wong-Reece 테라메카닉스 모델 (PyTorch)
-        # s: Slip ratio 텐서 (Shape: [N]) [ 0 ~ 1 ]
-        # h: 침하량 텐서 (Shape: [N]) [ 0 ~ R/2 ]
-        # v_c: 침하량 변화율 텐서 (Shape: [N])
-        # alpha: Side-Slip angle 텐서 (Shape: [N])
-
         device = h.device
         
-        # 파라미터 언패킹
-        Rw, b, n = self.R, self.p['b'], self.p['n']
-        kc, kphi = self.p['kc'], self.p['kphi']
-        c1, c2 = self.p['c1'], self.p['c2']
-        c_soil, phi_soil = self.p['c_soil'], self.p['phi_soil']
-        Kx, Ky = self.p['Kx'], self.p['Ky']
-        c_s = self.p['c_s']
-        mu_s = self.p['mu_s']
-        rho_s = self.p['rho_s']
+        # (num_envs,) 텐서를 (num_envs * 4,) 로 확장하는 헬퍼 함수
+        def expand_param(param_tensor):
+            return param_tensor.unsqueeze(1).expand(-1, 4).reshape(-1)
+
+        # 파라미터 언패킹 및 확장 (Shape: [N] -> [64])
+        Rw = self.R
+        b = expand_param(self.p['b'])
+        n = expand_param(self.p['n'])
+        kc = expand_param(self.p['kc'])
+        kphi = expand_param(self.p['kphi'])
+        c1 = expand_param(self.p['c1'])
+        c2 = expand_param(self.p['c2'])
+        c_soil = expand_param(self.p['c_soil'])
+        phi_soil = expand_param(self.p['phi_soil'])
+        Kx = expand_param(self.p['Kx'])
+        Ky = expand_param(self.p['Ky'])
+        c_s = expand_param(self.p['c_s'])
+        mu_s = expand_param(self.p['mu_s'])
+        rho_s = expand_param(self.p['rho_s'])
         
+        C1_exp = expand_param(self.C1)
+        C2_exp = expand_param(self.C2)
+
         k_eq = kc / b + kphi
 
-         # 1. 각도 계산 (Shape: [N])
+        # 1. 각도 계산 (Shape: [N])
         theta1 = torch.acos(1.0 - h / Rw)
         theta_m = (c1 + c2 * s) * theta1
 
         A_c = b * Rw * theta1 
-        A_c_safe = torch.clamp(A_c, min=1e-6) # 0으로 나누기 에러 방지
+        A_c_safe = torch.clamp(A_c, min=1e-6)
         p_damping = (c_s * v_c) / A_c_safe
         
-        # 0~1 사이의 정규화된 배열(t)을 만들고, 여기에 theta1을 곱해서 [N, 60] 차원으로 확장합니다.
-        num_points = 60
-        t = torch.linspace(0, 1, num_points, device=device) # [60]
+        num_points = 240
+        t = torch.linspace(0, 1, num_points, device=device)
         
         # theta Shape: [N, 60]
         theta = theta1.unsqueeze(1) * t.unsqueeze(0) 
         
-        # 연산을 위해 1D 텐서들을 [N, 60] 차원으로 맞춰줌 (Broadcasting)
+        # 연산을 위해 1D 텐서들을 [N, 1] 차원으로 맞춰줌 (Broadcasting 준비)
         theta1_exp = theta1.unsqueeze(1)
         theta_m_exp = theta_m.unsqueeze(1)
         s_exp = s.unsqueeze(1)
         alpha_exp = alpha.unsqueeze(1)
         p_damping_exp = p_damping.unsqueeze(1)
         
+        # [수정] 토양 파라미터들도 [N, 1]로 확장
+        n_exp = n.unsqueeze(1)
+        k_eq_exp = k_eq.unsqueeze(1)
+        c_soil_exp = c_soil.unsqueeze(1)
+        phi_soil_exp = phi_soil.unsqueeze(1)
+        mu_s_exp = mu_s.unsqueeze(1)
+        Kx_exp = Kx.unsqueeze(1)
+        Ky_exp = Ky.unsqueeze(1)
+        C1_mat = C1_exp.unsqueeze(1)
+        C2_mat = C2_exp.unsqueeze(1)
+        rho_s_mat = rho_s.unsqueeze(1)
+
         # 2. 구간 마스크 생성
         idx_F = theta >= theta_m_exp
         idx_R = theta < theta_m_exp
         
         # Normal stress
-        # (Front 구간)
         cos_diff_F = torch.cos(theta) - torch.cos(theta1_exp)
-        p_F = k_eq * (torch.clamp(Rw * cos_diff_F, min=0.0) ** n) + p_damping_exp
+        p_F = k_eq_exp * (torch.clamp(Rw * cos_diff_F, min=0.0) ** n_exp) + p_damping_exp
         
-        # (Rear 구간) - theta_m이 0일 때 0으로 나누기 에러 방지
         theta_m_safe = torch.where(theta_m_exp == 0, torch.tensor(1e-6, device=device), theta_m_exp)
         theta_eq = theta1_exp - (theta / theta_m_safe) * (theta1_exp - theta_m_exp)
         cos_diff_R = torch.cos(theta_eq) - torch.cos(theta1_exp)
-        p_R = k_eq * (torch.clamp(Rw * cos_diff_R, min=0.0) ** n) + p_damping_exp
+        p_R = k_eq_exp * (torch.clamp(Rw * cos_diff_R, min=0.0) ** n_exp) + p_damping_exp
 
-        # 마스크 적용
         p_theta = torch.zeros_like(theta)
         p_theta = torch.where(idx_F, p_F, p_theta)
         p_theta = torch.where(idx_R, p_R, p_theta)
         
-        # Shear stress
-        tau_max = torch.minimum(mu_s * p_theta, c_soil + p_theta * math.tan(phi_soil))
+        # Shear stress [수정: math.tan -> torch.tan]
+        tau_max = torch.minimum(mu_s_exp * p_theta, c_soil_exp + p_theta * torch.tan(phi_soil_exp))
         j_x = Rw * ((theta1_exp - theta) - (1 - s_exp) * (torch.sin(theta1_exp) - torch.sin(theta)))
         j_y = Rw * (1 - s_exp) * (theta1_exp - theta) * torch.tan(torch.abs(alpha_exp))
-        tau_x = tau_max * (1 - torch.exp(-j_x / Kx))
-        tau_y = tau_max * (1 - torch.exp(-j_y / Ky))
+        tau_x = tau_max * (1 - torch.exp(-j_x / Kx_exp))
+        tau_y = tau_max * (1 - torch.exp(-j_y / Ky_exp))
         
         # Bulldozing Resistance
         h_theta = torch.clamp(Rw * (torch.cos(theta) - torch.cos(theta1_exp)), min=0.0)
-        Rb_theta = self.C1 * (h_theta * c_soil + 0.5 * rho_s * (h_theta ** 2) * self.C2)
+        Rb_theta = C1_mat * (h_theta * c_soil_exp + 0.5 * rho_s_mat * (h_theta ** 2) * C2_mat)
         
-        # 5. 적분 (PyTorch의 trapezoid 함수 사용)
-        # y값 먼저 넣고, x값(theta) 넣고, 어느 축(dim=1)으로 적분할지 지정
+        # 5. 적분 (결과값 Shape: [N])
         Fn_mag        = Rw * b * torch.trapezoid(p_theta * torch.cos(theta) + tau_x * torch.sin(theta), x=theta, dim=1)
         Ft_normal_mag = Rw * b * torch.trapezoid(p_theta * torch.sin(theta), x=theta, dim=1)
         Ft_shear_mag  = Rw * b * torch.trapezoid(tau_x * torch.cos(theta), x=theta, dim=1)
